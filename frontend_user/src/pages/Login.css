@@ -1,0 +1,141 @@
+.login-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+.login-left {
+  flex: 1;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.logo-section {
+  text-align: center;
+}
+
+.logo-circle-large {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: white;
+  border: 8px solid var(--color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30px;
+}
+
+.logo-text-large {
+  font-family: var(--font-accent);
+  font-size: 100px;
+  color: var(--color-primary);
+}
+
+.brand-slogan {
+  font-family: var(--font-primary);
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--color-dark);
+  margin-top: 20px;
+  border-top: 4px solid var(--color-dark);
+  border-bottom: 4px solid var(--color-dark);
+  padding: 20px 0;
+  letter-spacing: 2px;
+}
+
+.login-right {
+  flex: 1;
+  background-color: var(--color-dark-purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 450px;
+}
+
+.login-title {
+  color: white;
+  font-size: 36px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  position: relative;
+}
+
+.password-group {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 5px;
+}
+
+.btn-submit {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 30px;
+  color: white;
+  font-size: 16px;
+}
+
+.register-link a {
+  color: var(--color-secondary);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.register-link a:hover {
+  color: var(--color-accent);
+}
+
+@media (max-width: 968px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .login-left,
+  .login-right {
+    min-height: 50vh;
+  }
+
+  .logo-circle-large {
+    width: 150px;
+    height: 150px;
+  }
+
+  .logo-text-large {
+    font-size: 70px;
+  }
+
+  .brand-slogan {
+    font-size: 28px;
+  }
+}

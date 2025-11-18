@@ -1,0 +1,132 @@
+.carta-page {
+  min-height: 100vh;
+  background-color: #f8f8f8;
+  padding-bottom: 40px;
+}
+
+.carta-header {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-dark-purple));
+  padding: 60px 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.carta-title {
+  font-family: var(--font-primary);
+  font-size: 48px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.carta-container {
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+}
+
+.categories-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 120px;
+  height: fit-content;
+}
+
+.category-btn {
+  background-color: white;
+  color: var(--color-dark);
+  padding: 18px 24px;
+  border-radius: 12px;
+  font-family: var(--font-primary);
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.category-btn:hover {
+  background-color: var(--color-light-cream);
+  border-color: var(--color-secondary);
+  transform: translateX(5px);
+}
+
+.category-btn.active {
+  background-color: var(--color-brown);
+  color: white;
+  border-color: var(--color-brown);
+  transform: translateX(5px);
+}
+
+.products-grid {
+  flex: 1;
+}
+
+.category-title {
+  font-family: var(--font-primary);
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--color-dark);
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 4px solid var(--color-secondary);
+}
+
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+@media (max-width: 1024px) {
+  .carta-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .categories-sidebar {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+
+  .category-btn {
+    white-space: nowrap;
+    min-width: 150px;
+  }
+
+  .category-btn:hover,
+  .category-btn.active {
+    transform: translateX(0);
+    transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 768px) {
+  .carta-title {
+    font-size: 36px;
+  }
+
+  .products-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .category-title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .products-container {
+    grid-template-columns: 1fr;
+  }
+}
