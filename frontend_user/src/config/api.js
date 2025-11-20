@@ -6,7 +6,7 @@
 // ============================================
 
 // Base URL del API Gateway (reemplaza con tu URL real de AWS)
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://tu-api-gateway.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sekbehf5na.execute-api.us-east-1.amazonaws.com/dev';
 
 export const API_ENDPOINTS = {
   

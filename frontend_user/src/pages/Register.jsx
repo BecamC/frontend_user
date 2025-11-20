@@ -1,16 +1,21 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { registerAPI, saveAuthData } from '../config/api';
 
 const Register = ({ onLogin }) => {
   const [formData, setFormData] = useState({
-    nombre: '',
+    name: '',
     apellido: '',
     email: '',
     password: '',
     confirmPassword: '',
+    phone: '',
+    gender: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,18 +25,62 @@ const Register = ({ onLogin }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (formData.password !== formData.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+      setError('Las contraseñas no coinciden');
       return;
     }
-    // Simulación de registro
-    onLogin({
-      email: formData.email,
-      nombre: formData.nombre,
-    });
-    navigate('/home');
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // 🔌 CONEXIÓN CON API REAL - REGISTRO CLIENTE
+      const data = await registerAPI({
+        name: `${formData.name} ${formData.apellido}`,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        gender: formData.gender,
+        user_type: 'cliente',
+        frontend_type: 'client'
+      });
+
+      const userData = {
+        email: data.email,
+        nombre: data.name,
+        rol: 'cliente',
+        id: data.user_id,
+        user_type: 'cliente',
+        is_verified: data.is_verified
+      };
+
+      // En el registro, no tenemos token aún, el usuario necesita verificar email
+      if (data.requires_verification) {
+        navigate('/verification-required', { state: { email: formData.email } });
+      } else {
+        // Si no requiere verificación, hacer login automático
+        const loginData = await loginAPI(formData.email, formData.password, 'client');
+        saveAuthData(loginData.token, userData);
+        onLogin(userData);
+        navigate('/home');
+      }
+
+    } catch (err) {
+      console.error('Error en registro:', err);
+      
+      if (err.message.includes('ya está registrado')) {
+        setError('Este email ya está registrado en el sistema.');
+      } else if (err.message.includes('Campos obligatorios')) {
+        setError('Por favor completa todos los campos obligatorios.');
+      } else {
+        setError(err.message || 'Error al crear la cuenta. Intenta nuevamente.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,12 +115,13 @@ const Register = ({ onLogin }) => {
               </label>
               <input
                 type="text"
-                name="nombre"
+                name="name"
                 placeholder="Tu nombre"
-                value={formData.nombre}
+                value={formData.name}
                 onChange={handleChange}
                 className="w-full px-8 py-5 rounded-full font-lato text-lg text-gray-700 focus:outline-none focus:ring-4 focus:ring-pardos-orange"
                 required
+                disabled={loading}
               />
             </div>
 
@@ -87,6 +137,7 @@ const Register = ({ onLogin }) => {
                 onChange={handleChange}
                 className="w-full px-8 py-5 rounded-full font-lato text-lg text-gray-700 focus:outline-none focus:ring-4 focus:ring-pardos-orange"
                 required
+                disabled={loading}
               />
             </div>
 
@@ -102,7 +153,42 @@ const Register = ({ onLogin }) => {
                 onChange={handleChange}
                 className="w-full px-8 py-5 rounded-full font-lato text-lg text-gray-700 focus:outline-none focus:ring-4 focus:ring-pardos-orange"
                 required
+                disabled={loading}
               />
+            </div>
+
+            <div>
+              <label className="text-white font-spartan font-bold text-sm mb-3 block">
+                TELÉFONO (OPCIONAL)
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Tu teléfono"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full px-8 py-5 rounded-full font-lato text-lg text-gray-700 focus:outline-none focus:ring-4 focus:ring-pardos-orange"
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label className="text-white font-spartan font-bold text-sm mb-3 block">
+                GÉNERO (OPCIONAL)
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="w-full px-8 py-5 rounded-full font-lato text-lg text-gray-700 focus:outline-none focus:ring-4 focus:ring-pardos-orange"
+                disabled={loading}
+              >
+                <option value="">Selecciona tu género</option>
+                <option value="masculino">Masculino</option>
+                <option value="femenino">Femenino</option>
+                <option value="otro">Otro</option>
+                <option value="prefiero-no-decir">Prefiero no decir</option>
+              </select>
             </div>
 
             <div>
@@ -118,11 +204,13 @@ const Register = ({ onLogin }) => {
                   onChange={handleChange}
                   className="w-full px-8 py-5 rounded-full font-lato text-lg text-gray-700 focus:outline-none focus:ring-4 focus:ring-pardos-orange pr-16"
                   required
+                  disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-200 hover:text-white"
+                  disabled={loading}
                 >
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {showPassword ? (
@@ -143,16 +231,18 @@ const Register = ({ onLogin }) => {
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   name="confirmPassword"
-                  placeholder="Contraseña"
+                  placeholder="Confirmar contraseña"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="w-full px-8 py-5 rounded-full font-lato text-lg text-gray-700 focus:outline-none focus:ring-4 focus:ring-pardos-orange pr-16"
                   required
+                  disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-200 hover:text-white"
+                  disabled={loading}
                 >
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {showConfirmPassword ? (
@@ -165,11 +255,28 @@ const Register = ({ onLogin }) => {
               </div>
             </div>
 
+            {error && (
+              <p className="text-center text-red-200 text-base mt-4 font-lato bg-red-500/20 py-2 px-4 rounded-lg">
+                ⚠️ {error}
+              </p>
+            )}
+
             <button
               type="submit"
-              className="w-full bg-pardos-brown hover:bg-pardos-purple text-white font-spartan font-bold py-6 text-2xl rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg mt-8"
+              className="w-full bg-pardos-brown hover:bg-pardos-purple text-white font-spartan font-bold py-6 text-2xl rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
             >
-              Crear cuenta
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creando cuenta...
+                </div>
+              ) : (
+                'Crear cuenta'
+              )}
             </button>
           </form>
 
@@ -185,7 +292,6 @@ const Register = ({ onLogin }) => {
             </p>
           </div>
         </div>
-
       </div>
     </div>
   );
